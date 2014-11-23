@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Stage I: Reverse a string</title>
+	</head>
+
+	<body>
+		<div style="text-align: center; margin-top: 25%">
+			<input placeholder="token" id="token">
+			<button type="submit" onclick="sendRequest()">Submit</button>
+			<p id="from_to"></p>
+			<br>
+
+			<p id="p1"></p>
+			<p id="p2"></p>
+			<p id="p3"></p>
+			<br>
+			<p id="p4"></p>
+			<p id="p5"></p>
+			<p id="p6"></p>
+		</div>
+
+		<script>
+		var xhr1 = new XMLHttpRequest();
+		xhr1.open("POST", "http://challenge.code2040.org/api/getstring", false);
+
+		function sendRequest() {
+			xhr1.send('{"token":"'+ document.getElementById("token").value +'"}');
+
+			document.getElementById("p1").innerHTML = "Status Code 1: " + xhr1.status;
+			document.getElementById("p2").innerHTML = "Status Text 1: " + xhr1.statusText;
+			document.getElementById("p3").innerHTML = "Response 1: " + xhr1.responseText;
+
+			var given = JSON.parse(xhr1.response).result;
+			var reversed = given.split("").reverse().join("");
+			document.getElementById("from_to").innerHTML = given + " --> " + reversed;
+
+			var xhr2 = new XMLHttpRequest();
+			xhr2.open("POST", "http://challenge.code2040.org/api/validatestring", false);
+			xhr2.send('{"token":"'+ document.getElementById("token").value +'","string":"'+ reversed +'"}');
+
+			document.getElementById("p4").innerHTML = "Status Code 2: " + xhr2.status;
+			document.getElementById("p5").innerHTML = "Status Text 2: " + xhr2.statusText;
+			document.getElementById("p6").innerHTML = "Response 2: " + xhr2.responseText;
+		}
+		</script>
+	</body>
+</html>
