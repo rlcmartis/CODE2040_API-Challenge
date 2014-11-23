@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Stage III: Prefix</title>
+	</head>
+
+	<body>
+		<div style="text-align: center; margin-top: 25%">
+			<input placeholder="token" id="token">
+			<button type="submit" onclick="sendRequest()">Submit</button>
+			<p id="arraySent"></p>
+			<br>
+
+			<p id="p1"></p>
+			<p id="p2"></p>
+			<p id="p3"></p>
+			<br>
+			<p id="p4"></p>
+			<p id="p5"></p>
+			<p id="p6"></p>
+		</div>
+
+		<script>
+		var xhr1 = new XMLHttpRequest();
+		xhr1.open("POST", "http://challenge.code2040.org/api/prefix", false);
+
+		var prefixed = function(str1, str2){
+			for (i = 0; i<str2.length; i++){
+				if (str1[i] != str2[i]) return false;
+			}
+			return true;
+		}
+
+		function sendRequest() {
+			xhr1.send('{"token":"'+ document.getElementById("token").value +'"}');
+
+			document.getElementById("p1").innerHTML = "Status Code 1: " + xhr1.status;
+			document.getElementById("p2").innerHTML = "Status Text 1: " + xhr1.statusText;
+			document.getElementById("p3").innerHTML = "Response 1: " + xhr1.responseText;
+
+			var prefixStr = JSON.parse(xhr1.response).result.prefix;
+			var stringArr = JSON.parse(xhr1.response).result.array;
+			
+			var resultArr = [];
+			for (var i=0; i < stringArr.length ; i++){
+				if (!(prefixed(stringArr[i], prefixStr))){
+					resultArr.push(stringArr[i]);
+				}
+			}
+
+			var xhr2 = new XMLHttpRequest();
+			xhr2.open("POST", "http://challenge.code2040.org/api/validateprefix", false);
+			xhr2.send('{"token":"'+ document.getElementById("token").value +'","array":'+ JSON.stringify(resultArr) +'}');
+
+			document.getElementById("arraySent").innerHTML = JSON.stringify(resultArr);
+
+			document.getElementById("p4").innerHTML = "Status Code 2: " + xhr2.status;
+			document.getElementById("p5").innerHTML = "Status Text 2: " + xhr2.statusText;
+			document.getElementById("p6").innerHTML = "Response 2: " + xhr2.responseText;
+		}
+		</script>
+	</body>
+</html>
