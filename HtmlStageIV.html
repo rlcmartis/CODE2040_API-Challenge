@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Stage IV: The dating game</title>
+	</head>
+
+	<body>
+		<div style="text-align: center; margin-top: 25%">
+			<input placeholder="token" id="token">
+			<button type="submit" onclick="sendRequest()">Submit</button>
+			<p id="datestamp"></p>
+			<br>
+
+			<p id="p1"></p>
+			<p id="p2"></p>
+			<p id="p3"></p>
+			<br>
+			<p id="p4"></p>
+			<p id="p5"></p>
+			<p id="p6"></p>
+		</div>
+
+		<script>
+		var xhr1 = new XMLHttpRequest();
+		xhr1.open("POST", "http://challenge.code2040.org/api/time", false);
+
+        function addIntervalToDate(date, interval){
+            var years = parseFloat(date.split("T")[0].split("-")[0]);
+            var months = parseFloat(date.split("T")[0].split("-")[1]);
+            var days = parseFloat(date.split("T")[0].split("-")[2]);
+            var hours = parseFloat(date.split("T")[1].split(":")[0]);
+            var minutes = parseFloat(date.split("T")[1].split(":")[1]);
+            var seconds = parseFloat(date.split("T")[1].split(":")[2].split("Z")[0]);
+    
+            var tmp = interval + seconds;
+            seconds = tmp % 60;
+            interval = Math.floor(tmp / 60);
+        
+            seconds = Math.round(seconds*1000)/1000;
+            var ss = String(seconds);
+            if (ss.split('.').length == 2) {
+                if (ss.split('.')[1].length == 2) {
+                    ss = String(seconds) + "0";
+                } else if (ss.split('.')[1].length == 1) {
+                    ss = String(seconds) + "00";
+                }
+            } else {
+                ss = String(seconds) + ".000";
+            }
+            if (ss.split('.')[0].length == 1){
+                ss = "0" + ss;
+            }
+    
+            tmp = interval + minutes;
+            minutes = tmp % 60;
+            interval = Math.floor(tmp / 60);
+        
+            var mm = String(minutes);
+            if (mm.length == 1){
+                mm = "0" + mm;
+            }
+
+            tmp = interval + hours;
+            hours = tmp % 24;
+            interval = Math.floor(tmp / 24);
+        
+            var hh = String(hours);
+            if (hh.length == 1){
+                hh = "0" + hh;
+            }
+        
+            while (interval != 0) {
+                if (days == 31){
+                    if (months == 12){
+                        years++;
+                        months = 1;
+                    } else {
+                        months++;
+                    }
+                    days = 1;
+                } else if (days == 30 && (months == 4 || months == 6 || months == 9 || months == 11)){
+                    months++;
+                    days = 1;
+                } else if (days == 29 && months == 2) {
+                    months++;
+                    days = 1;
+                } else if (days == 28 && months == 2 && ((years % 4 != 0 || years % 100 == 0) && (years % 400 != 0))) {
+                    months++;
+                    days = 1;
+                } else {
+                    days++;
+                }
+                interval--;
+            }
+        
+            var YY = String(years);
+            var MM = String(months);
+            var DD = String(days);
+            if (MM.length == 1){
+                MM = "0" + MM;
+            }
+            if (DD.length == 1){
+                DD = "0" + DD;
+            }
+        
+            return YY +'-'+ MM +'-'+ DD +'T'+ hh +':'+ mm +':'+ ss +'Z'; 
+        }
+
+		function sendRequest() {
+			xhr1.send('{"token":"'+ document.getElementById("token").value +'"}');
+
+			document.getElementById("p1").innerHTML = "Status Code 1: " + xhr1.status;
+			document.getElementById("p2").innerHTML = "Status Text 1: " + xhr1.statusText;
+			document.getElementById("p3").innerHTML = "Response 1: " + xhr1.responseText;
+
+			var dateStr = JSON.parse(xhr1.response).result.datestamp;
+			var interval = JSON.parse(xhr1.response).result.interval;
+
+			var xhr2 = new XMLHttpRequest();
+			xhr2.open("POST", "http://challenge.code2040.org/api/validatetime", false);
+			xhr2.send('{"token":"'+ document.getElementById("token").value +'","datestamp":"'+ addIntervalToDate(dateStr, interval) +'"}');
+
+			document.getElementById("datestamp").innerHTML = addIntervalToDate(dateStr, interval);
+
+			document.getElementById("p4").innerHTML = "Status Code 2: " + xhr2.status;
+			document.getElementById("p5").innerHTML = "Status Text 2: " + xhr2.statusText;
+			document.getElementById("p6").innerHTML = "Response 2: " + xhr2.responseText;
+		}
+		</script>
+	</body>
+</html>
