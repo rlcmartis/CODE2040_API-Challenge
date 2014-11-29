@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Getting grades...</title>
+	</head>
+
+	<body>
+		<div style="text-align: center; margin-top: 25%">
+			<input placeholder="token" id="token">
+			<button type="submit" onclick="sendRequest()">Submit</button>
+
+			<p id="p1"></p>
+			<p id="p2"></p>
+			<p id="p3"></p>
+		</div>
+
+		<script>
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "http://challenge.code2040.org/api/status", false);
+
+		function sendRequest() {
+			xhr.send('{"token":"'+ document.getElementById("token").value +'"}');
+			document.getElementById("p1").innerHTML = "Status Code: " + xhr.status;
+			document.getElementById("p2").innerHTML = "Status Text: " + xhr.statusText;
+			document.getElementById("p3").innerHTML = "Response: " + xhr.responseText;
+		}
+		</script>
+	</body>
+</html>
